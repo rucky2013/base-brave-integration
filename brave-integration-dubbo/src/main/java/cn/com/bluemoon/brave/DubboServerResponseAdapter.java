@@ -4,6 +4,7 @@ import com.github.kristofa.brave.KeyValueAnnotation;
 import com.github.kristofa.brave.ServerResponseAdapter;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 对应 SS 阶段
@@ -12,6 +13,6 @@ import java.util.Collection;
  */
 public class DubboServerResponseAdapter implements ServerResponseAdapter {
     public Collection<KeyValueAnnotation> responseAnnotations() {
-        return null;
+        return Collections.emptyList();
     }
 }

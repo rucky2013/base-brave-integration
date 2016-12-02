@@ -1,6 +1,9 @@
 package cn.com.bluemoon.config;
 
-import com.github.kristofa.brave.*;
+import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.BraveApiConfig;
+import com.github.kristofa.brave.InheritableServerClientAndLocalSpanState;
+import com.github.kristofa.brave.LocalTracer;
 import com.twitter.zipkin.gen.Endpoint;
 import org.springframework.context.annotation.*;
 import zipkin.Span;
@@ -10,12 +13,12 @@ import zipkin.reporter.Sender;
 import zipkin.reporter.kafka08.KafkaSender;
 
 /**
- * Created by leonwong on 2016/11/28.
+ * Created by leonwong on 2016/12/2.
  */
 @Configuration
 @Import(BraveApiConfig.class)
 @EnableAspectJAutoProxy
-public class SampleConfiguration {
+public class ServiceBConfiguration {
     @Bean
     public Sender sender() {
         return KafkaSender.create("192.168.240.42:9092,192.168.240.43:9092,192.168.240.44:9092");
@@ -39,7 +42,7 @@ public class SampleConfiguration {
     @Scope
     public Brave brave() {
         return new Brave.Builder(
-                new InheritableServerClientAndLocalSpanState(Endpoint.builder().serviceName("brave-integration-sample-A").build()))
+                new InheritableServerClientAndLocalSpanState(Endpoint.builder().serviceName("brave-integration-sample-B").build()))
                 .reporter(reporter()).build();
     }
 
