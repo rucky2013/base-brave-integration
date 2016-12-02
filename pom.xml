@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <groupId>cn.com.bluemoon</groupId>
+    <artifactId>base-brave-integration</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>brave-integration-dubbo</module>
+        <module>brave-integration-sample-A</module>
+        <module>brave-integration-sample-api</module>
+        <module>brave-integration-sample-B</module>
+        <module>brave-integration-sample-C</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>4.3.3.RELEASE</spring.version>
+        <zipkin-reporter.version>0.6.9</zipkin-reporter.version>
+        <jetty.version>8.1.20.v20160902</jetty.version>
+        <brave.version>3.15.4-SNAPSHOT</brave.version>
+        <aspectj.version>1.7.4</aspectj.version>
+    </properties>
+
+</project>

@@ -1,0 +1,12 @@
+spring.dubbo:
+  application:
+    name: brave-integration-sample-B #应用名
+  registry:
+    address: zookeeper://127.0.0.1:2181 #zk地址
+  protocol:
+    name: dubbo #协议名
+    port: 20880 #协议端口
+  scan: cn.com.bluemoon #扫描包名
+
+server:
+  port: 8082
