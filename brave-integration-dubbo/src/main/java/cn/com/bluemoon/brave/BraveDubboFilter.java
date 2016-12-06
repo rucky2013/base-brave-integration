@@ -60,24 +60,50 @@ public class BraveDubboFilter implements Filter {
 
         RpcContext context = RpcContext.getContext();
         /*
+          调用的方法名
           以此作为 span name
          */
         String methodName = invocation.getMethodName();
 
+        /*
+          provider 应用相关信息
+         */
+        String interfaceName = context.getUrl().getServiceInterface();
+        String invokeUrl = context.getUrl().toFullString();
+        String ipv4 = context.getUrl().getIp();
+        int port = context.getUrl().getPort();
+
         if ("0".equals(invocation.getAttachment(BraveDubboHeaders.SAMPLED.name()))) {
             return invoker.invoke(invocation);
         }
+
+        RpcException rpcException = null;
+
         if (context.isConsumerSide()) {
             /*
               Client 端
              */
-            final DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(methodName);
+            DubboClientRequestAdapter.Metadata metadata =
+                    new DubboClientRequestAdapter.Metadata()
+                            .setIpv4(ipv4)
+                            .setPort(port)
+                            .setRequestUrl(invokeUrl)
+                            // TODO 这里应该用 application name
+                            .setAppName(interfaceName);
+            final DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(methodName, metadata);
             clientRequestInterceptor.handle(clientRequestAdapter);
 
-            Result result = invoker.invoke(invocation);
+            Result result = null;
 
-            final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter();
-            clientResponseInterceptor.handle(clientResponseAdapter);
+            try {
+                result = invoker.invoke(invocation);
+            } catch (RpcException e) {
+                rpcException = e;
+            } finally {
+                final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter();
+                clientResponseAdapter.setRpcException(rpcException);
+                clientResponseInterceptor.handle(clientResponseAdapter);
+            }
             return result;
         } else if (context.isProviderSide()) {
             /*
@@ -86,10 +112,17 @@ public class BraveDubboFilter implements Filter {
             final DubboServerRequestAdapter serverRequestAdapter = new DubboServerRequestAdapter(invocation);
             serverRequestInterceptor.handle(serverRequestAdapter);
 
-            Result result = invoker.invoke(invocation);
+            Result result = null;
 
-            final DubboServerResponseAdapter serverResponseAdapter = new DubboServerResponseAdapter();
-            serverResponseInterceptor.handle(serverResponseAdapter);
+            try {
+                result = invoker.invoke(invocation);
+            } catch (RpcException e) {
+                rpcException = e;
+            } finally {
+                final DubboServerResponseAdapter serverResponseAdapter = new DubboServerResponseAdapter();
+                serverResponseAdapter.setRpcException(rpcException);
+                serverResponseInterceptor.handle(serverResponseAdapter);
+            }
             return result;
         }
         return invoker.invoke(invocation);

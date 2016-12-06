@@ -51,7 +51,8 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
     }
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
-        return Collections.emptyList();
+        return Collections.singleton(KeyValueAnnotation.create(
+                TraceKeysExt.DUBBO_PROVIDER_URL.getKey(), invocation.getInvoker().getUrl().toFullString()));
     }
 
     private SpanId getSpanId(String traceId, String spanId, String parentSpanId) {

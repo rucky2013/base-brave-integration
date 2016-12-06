@@ -2,7 +2,7 @@ spring.dubbo:
   application:
     name: brave-integration-sample-B #应用名
   registry:
-    address: zookeeper://127.0.0.1:2181 #zk地址
+    address: zookeeper://192.168.240.15:2181?backup=192.168.240.15:2182,192.168.240.15:2183 #zk地址
   protocol:
     name: dubbo #协议名
     port: 20880 #协议端口

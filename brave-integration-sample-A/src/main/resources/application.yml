@@ -1,4 +1,6 @@
 spring.dubbo:
+  application:
+      name: brave-integration-sample-A #应用名
   registry:
-    address: zookeeper://127.0.0.1:2181
-  scan: cn.com.bluemoon
+    address: zookeeper://192.168.240.15:2181?backup=192.168.240.15:2182,192.168.240.15:2183
+  scan: cn

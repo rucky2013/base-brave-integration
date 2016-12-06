@@ -20,7 +20,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>4.3.3.RELEASE</spring.version>
-        <zipkin-reporter.version>0.6.9</zipkin-reporter.version>
+        <zipkin-reporter.version>0.6.10-SNAPSHOT</zipkin-reporter.version>
         <jetty.version>8.1.20.v20160902</jetty.version>
         <brave.version>3.15.4-SNAPSHOT</brave.version>
         <aspectj.version>1.7.4</aspectj.version>

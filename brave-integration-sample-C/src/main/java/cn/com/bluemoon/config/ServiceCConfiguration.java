@@ -4,6 +4,7 @@ import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.BraveApiConfig;
 import com.github.kristofa.brave.InheritableServerClientAndLocalSpanState;
 import com.github.kristofa.brave.LocalTracer;
+import com.google.common.net.InetAddresses;
 import com.twitter.zipkin.gen.Endpoint;
 import org.springframework.context.annotation.*;
 import zipkin.Span;
@@ -11,6 +12,9 @@ import zipkin.reporter.AsyncReporter;
 import zipkin.reporter.Reporter;
 import zipkin.reporter.Sender;
 import zipkin.reporter.kafka08.KafkaSender;
+
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
 /**
  * Created by leonwong on 2016/12/2.
@@ -40,9 +44,13 @@ public class ServiceCConfiguration {
      */
     @Bean
     @Scope
-    public Brave brave() {
+    public Brave brave() throws UnknownHostException {
         return new Brave.Builder(
-                new InheritableServerClientAndLocalSpanState(Endpoint.builder().serviceName("brave-integration-sample-C").build()))
+                new InheritableServerClientAndLocalSpanState(
+                        Endpoint.builder()
+                                .ipv4(InetAddresses.coerceToInteger(Inet4Address.getLocalHost()))
+                                .serviceName("brave-integration-sample-C")
+                                .build()))
                 .reporter(reporter()).build();
     }
 
@@ -53,7 +61,7 @@ public class ServiceCConfiguration {
      */
     @Bean
     @Scope(value = "singleton")
-    public LocalTracer localTracer() {
+    public LocalTracer localTracer() throws UnknownHostException {
         return brave().localTracer();
     }
 }
