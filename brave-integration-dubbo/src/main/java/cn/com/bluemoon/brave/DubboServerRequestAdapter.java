@@ -7,7 +7,7 @@ import com.github.kristofa.brave.SpanId;
 import com.github.kristofa.brave.TraceData;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 
 import static com.github.kristofa.brave.IdConversion.convertToLong;
 
@@ -23,8 +23,11 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
 
     private final Invocation invocation;
 
-    public DubboServerRequestAdapter(Invocation invocation) {
+    private final Metadata metadata;
+
+    public DubboServerRequestAdapter(Invocation invocation, Metadata metadata) {
         this.invocation = invocation;
+        this.metadata = metadata;
     }
 
     public TraceData getTraceData() {
@@ -51,8 +54,12 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
     }
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
-        return Collections.singleton(KeyValueAnnotation.create(
+        HashSet<KeyValueAnnotation> hashSet = new HashSet<KeyValueAnnotation>();
+        hashSet.add(KeyValueAnnotation.create(
                 TraceKeysExt.DUBBO_PROVIDER_URL.getKey(), invocation.getInvoker().getUrl().toFullString()));
+        hashSet.add(KeyValueAnnotation.create(
+                TraceKeysExt.DUBBO_SERVER_ADDR.getKey(), metadata.getIpv4() + ":" + metadata.getPort() + "(" + metadata.getAppName() + ")"));
+        return hashSet;
     }
 
     private SpanId getSpanId(String traceId, String spanId, String parentSpanId) {
@@ -61,5 +68,39 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
                 .traceId(convertToLong(traceId))
                 .spanId(convertToLong(spanId))
                 .parentId(parentSpanId == null ? null : convertToLong(parentSpanId)).build();
+    }
+
+    static class Metadata {
+
+        private String ipv4;
+        private int port;
+        private String appName;
+
+        public String getAppName() {
+            return appName;
+        }
+
+        public Metadata setAppName(String appName) {
+            this.appName = appName;
+            return this;
+        }
+
+        public String getIpv4() {
+            return ipv4;
+        }
+
+        public Metadata setIpv4(String ipv4) {
+            this.ipv4 = ipv4;
+            return this;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public Metadata setPort(int port) {
+            this.port = port;
+            return this;
+        }
     }
 }

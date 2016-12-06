@@ -6,12 +6,10 @@ import com.github.kristofa.brave.IdConversion;
 import com.github.kristofa.brave.KeyValueAnnotation;
 import com.github.kristofa.brave.SpanId;
 import com.github.kristofa.brave.internal.Nullable;
-import com.google.common.net.InetAddresses;
 import com.twitter.zipkin.gen.Endpoint;
 
-import java.net.InetAddress;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * 对应 CS 阶段
@@ -48,48 +46,30 @@ class DubboClientRequestAdapter implements ClientRequestAdapter {
     }
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
-        return Collections.singleton(KeyValueAnnotation.create(
+        HashSet<KeyValueAnnotation> hashSet = new HashSet<KeyValueAnnotation>();
+        hashSet.add(KeyValueAnnotation.create(
                 TraceKeysExt.DUBBO_CONSUMER_URL.getKey(), metadata.getRequestUrl()));
+        hashSet.add(KeyValueAnnotation.create(
+                TraceKeysExt.DUBBO_CLIENT_ADDR.getKey(), metadata.getIpv4()));
+        return hashSet;
     }
 
+    /**
+     * dubbo 不适用这个方法
+     *
+     * @return
+     */
     public Endpoint serverAddress() {
-        return Endpoint.builder().serviceName(metadata.getAppName())
-                .ipv4(metadata.getIpv4())
-                .port(metadata.getPort()).build();
+        return null;
     }
 
     static class Metadata {
+
         private String ipv4;
-        private int port;
         private String requestUrl;
-        private String appName;
 
-        public String getAppName() {
-            return appName;
-        }
-
-        public Metadata setAppName(String appName) {
-            this.appName = appName;
-            return this;
-        }
-
-        public int getPort() {
-            return port;
-        }
-
-        public Metadata setPort(int port) {
-            this.port = port;
-            return this;
-        }
-
-        public int getIpv4() {
-            InetAddress inetAddress = InetAddresses.fromInteger(0);
-            try {
-                inetAddress = InetAddresses.forString(this.ipv4);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return InetAddresses.coerceToInteger(inetAddress);
+        public String getIpv4() {
+            return this.ipv4;
         }
 
         public Metadata setIpv4(String ipv4) {

@@ -68,10 +68,12 @@ public class BraveDubboFilter implements Filter {
         /*
           provider 应用相关信息
          */
-        String interfaceName = context.getUrl().getServiceInterface();
         String invokeUrl = context.getUrl().toFullString();
         String ipv4 = context.getUrl().getIp();
         int port = context.getUrl().getPort();
+        String appName = context.getUrl().getParameter("application");
+
+        String localIpv4 = context.getLocalHost();
 
         if ("0".equals(invocation.getAttachment(BraveDubboHeaders.SAMPLED.name()))) {
             return invoker.invoke(invocation);
@@ -85,11 +87,8 @@ public class BraveDubboFilter implements Filter {
              */
             DubboClientRequestAdapter.Metadata metadata =
                     new DubboClientRequestAdapter.Metadata()
-                            .setIpv4(ipv4)
-                            .setPort(port)
-                            .setRequestUrl(invokeUrl)
-                            // TODO 这里应该用 application name
-                            .setAppName(interfaceName);
+                            .setIpv4(localIpv4)
+                            .setRequestUrl(invokeUrl);
             final DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(methodName, metadata);
             clientRequestInterceptor.handle(clientRequestAdapter);
 
@@ -109,7 +108,12 @@ public class BraveDubboFilter implements Filter {
             /*
               Server 端
              */
-            final DubboServerRequestAdapter serverRequestAdapter = new DubboServerRequestAdapter(invocation);
+            DubboServerRequestAdapter.Metadata metadata =
+                    new DubboServerRequestAdapter.Metadata()
+                            .setIpv4(ipv4)
+                            .setPort(port)
+                            .setAppName(appName);
+            final DubboServerRequestAdapter serverRequestAdapter = new DubboServerRequestAdapter(invocation, metadata);
             serverRequestInterceptor.handle(serverRequestAdapter);
 
             Result result = null;
