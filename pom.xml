@@ -14,6 +14,7 @@
         <module>brave-integration-sample-api</module>
         <module>brave-integration-sample-B</module>
         <module>brave-integration-sample-C</module>
+        <module>brave-integration-sdk</module>
     </modules>
     <packaging>pom</packaging>
 
